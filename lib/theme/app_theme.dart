@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  const AppTheme._();
+  AppTheme._();
 
   static final lightTheme = ThemeData(
     brightness: Brightness.light,

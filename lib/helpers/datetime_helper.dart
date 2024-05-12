@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 class DateTimeHelper {
   static String getCurrentFormattedTime() {
     DateTime now = DateTime.now();
-    final timeFormatter = DateFormat('jms');
+    final timeFormatter = DateFormat('jm');
     return timeFormatter.format(now);
   }
 

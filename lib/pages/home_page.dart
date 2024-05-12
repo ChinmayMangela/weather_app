@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:weather/weather.dart';
@@ -9,6 +10,8 @@ import 'package:weather_app/services/location_service.dart';
 import 'package:weather_app/widgets/additional_info_container.dart';
 import 'package:weather_app/widgets/background_gradient.dart';
 import 'package:weather_app/widgets/build_text.dart';
+
+import '../theme/app_theme.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +25,8 @@ class _HomePageState extends State<HomePage> {
   Weather? _weather;
   String formattedTime = '';
   String formattedDay = '';
+  var lightTheme = AppTheme.lightTheme;
+  var darkTheme = AppTheme.darkTheme;
 
   _updateDateNdTime() {
     setState(() {
@@ -32,7 +37,7 @@ class _HomePageState extends State<HomePage> {
 
   _showTimer() {
     Timer.periodic(
-      const Duration(seconds: 1),
+      const Duration(seconds: 60),
       (_) {
         _updateDateNdTime();
       },
@@ -65,40 +70,42 @@ class _HomePageState extends State<HomePage> {
         ? const Center(
             child: CircularProgressIndicator(),
           )
-        : Stack(
-            children: [
-              const BackgroundGradient(),
-              Positioned(
-                left: 10.w,
-                top: 40.h,
-                child: _buildLocationWidget(brightness),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    BuildText(formattedTime, 27, true),
-                    SizedBox(height: 10.h),
-                    BuildText(formattedDay, 20, true),
-                    SizedBox(height: 30.h),
-                    _buildWeatherIcon(),
-                    BuildText(
-                        _weather!.weatherDescription.toString(), 20.sp, true),
-                    SizedBox(height: 20.h),
-                    BuildText(
-                        '${_weather?.temperature?.celsius?.toStringAsFixed(0)}° C',
-                        100.sp,
-                        true),
-                    SizedBox(height: 20.h),
-                    AdditionalInfoContainer(weather: _weather!),
-                  ],
+        : ThemeSwitchingArea(
+            child: Stack(
+              children: [
+                const BackgroundGradient(),
+                Positioned(
+                  left: 10.w,
+                  top: 40.h,
+                  child: _buildLocationWidget(brightness),
                 ),
-              )
-            ],
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      BuildText(formattedTime, 27, true),
+                      SizedBox(height: 10.h),
+                      BuildText(formattedDay, 20, true),
+                      SizedBox(height: 30.h),
+                      _buildWeatherIcon(),
+                      BuildText(
+                          _weather!.weatherDescription.toString(), 20.sp, true),
+                      SizedBox(height: 20.h),
+                      BuildText(
+                          '${_weather?.temperature?.celsius?.toStringAsFixed(0)}° C',
+                          100.sp,
+                          true),
+                      SizedBox(height: 20.h),
+                      AdditionalInfoContainer(weather: _weather!),
+                    ],
+                  ),
+                )
+              ],
+            ),
           );
   }
 
@@ -114,7 +121,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildLocationWidget(Brightness brightness) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(
           Icons.location_on,
@@ -124,6 +131,29 @@ class _HomePageState extends State<HomePage> {
           size: 25.h,
         ),
         BuildText(_weather?.areaName ?? "", 14.sp, true),
+        SizedBox(
+          width: 180.w,
+        ),
+        ThemeSwitcher(
+            clipper: const ThemeSwitcherCircleClipper(),
+            builder: (context) {
+          return IconButton(
+            onPressed: () {
+              var brightness =
+                  Theme.of(context).brightness;
+              ThemeSwitcher.of(context).changeTheme(
+                theme: brightness == Brightness.dark ? lightTheme : darkTheme,
+                isReversed: brightness == Brightness.light ? true : false,
+              );
+            },
+            icon: Icon(
+              Theme.of(context).brightness ==
+                  Brightness.dark
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+          );
+        })
       ],
     );
   }

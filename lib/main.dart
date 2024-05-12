@@ -1,3 +1,4 @@
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:weather_app/pages/home_page.dart';
@@ -15,10 +16,13 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       builder: (context, child) {
-        return MaterialApp(
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          home: const HomePage(),
+        return ThemeProvider(
+          initTheme: AppTheme.lightTheme,
+          builder: (p0, theme) => MaterialApp(
+            theme: theme,
+            darkTheme: AppTheme.darkTheme,
+            home: const HomePage(),
+          ),
         );
       },
     );
